@@ -15,9 +15,13 @@ pipeline {
         stage('Security Scan - Bandit') {
             steps {
                 sh '''
-                    echo "Ejecutando Bandit dentro de un contenedor..."
+                    echo "Ejecutando Bandit..."
+                    echo "Workspace real: $WORKSPACE"
+                    echo "Contenido del workspace:"
+                    ls -R $WORKSPACE
+
                     docker run --rm \
-                        -v $(pwd)/app:/scan \
+                        -v $WORKSPACE/app:/scan \
                         python:3.11-slim sh -c "
                             pip install --quiet bandit && \
                             bandit -r /scan
