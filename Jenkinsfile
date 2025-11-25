@@ -15,15 +15,16 @@ pipeline {
         stage('Security Scan - Bandit') {
             steps {
                 sh '''
-                    echo "Instalando Bandit..."
-                    pip3 install bandit
-
-                    echo "Ejecutando Bandit..."
-                    bandit -r app/ || true
+                    echo "Ejecutando Bandit dentro de un contenedor..."
+                    docker run --rm \
+                        -v $(pwd)/app:/scan \
+                        python:3.11-slim sh -c "
+                            pip install --quiet bandit && \
+                            bandit -r /scan
+                        " || true
                 '''
             }
         }
-
 
         stage('Build Docker Image') {
             steps {
