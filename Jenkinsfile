@@ -32,17 +32,20 @@ pipeline {
                 echo "Iniciando escaneo DAST con OWASP ZAP"
 
                 sh """
+                    docker pull ghcr.io/zaproxy/zaproxy:stable || true
+
                     docker run --rm \
                         -v \$(pwd)/zap_reports:/zap/reports \
-                        -t owasp/zap2docker-stable \
+                        ghcr.io/zaproxy/zaproxy:stable \
                         zap-baseline.py \
-                        -t http://app-test:5000 \
+                        -t http://localhost:5000 \
                         -r zap_report.html || true
                 """
 
                 echo "Informe generado en zap_reports/zap_report.html"
             }
         }
+
 
 
         stage('Security Scan - Bandit') {
