@@ -34,17 +34,18 @@ pipeline {
                     docker run -d --name zap-app -p 5000:5000 evaluacion3-app
                     sleep 8
 
-                    echo " Ejecutando OWASP ZAP..."
-
+                    echo " Creando carpeta zap_reports con permisos correctos..."
                     mkdir -p ${WORKSPACE}/zap_reports
+                    chmod -R 777 ${WORKSPACE}/zap_reports
 
+                    echo " Ejecutando OWASP ZAP..."
                     docker run --rm \
                         --network host \
                         -v "${WORKSPACE}/zap_reports:/zap/wrk" \
                         ghcr.io/zaproxy/zaproxy:stable \
                         zap-baseline.py -t http://localhost:5000 -r zap_report.html || true
 
-                    echo " Reporte ZAP generado en:"
+                    echo "📄 Reporte ZAP generado en:"
                     echo "${WORKSPACE}/zap_reports/zap_report.html"
 
                     docker stop zap-app || true
@@ -52,6 +53,7 @@ pipeline {
                 '''
             }
         }
+
 
 
         stage('Security Scan - Bandit') {
