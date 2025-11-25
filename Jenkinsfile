@@ -19,11 +19,11 @@ pipeline {
                     echo "Workspace real: $(pwd)"
 
                     docker run --rm \
-                        -v "$(pwd)/app:/scan" \
+                        -v "${WORKSPACE}/app:/scan" \
                         python:3.11-slim sh -c "
                             pip install --quiet bandit && \
-                            bandit -r /scan -lll
-                        " || true
+                            bandit -r /scan
+                        "
                 '''
             }
         }
