@@ -27,6 +27,23 @@ pipeline {
             }
         }
 
+        stage('Security Scan - OWASP ZAP') {
+            steps {
+                echo "Iniciando escaneo DAST con OWASP ZAP"
+
+                sh """
+                    docker run --rm \
+                        -v \$(pwd)/zap_reports:/zap/reports \
+                        -t owasp/zap2docker-stable \
+                        zap-baseline.py \
+                        -t http://app-test:5000 \
+                        -r zap_report.html || true
+                """
+
+                echo "Informe generado en zap_reports/zap_report.html"
+            }
+        }
+
 
         stage('Security Scan - Bandit') {
             steps {
