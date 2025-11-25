@@ -16,13 +16,14 @@ pipeline {
             steps {
                 sh '''
                     echo "Instalando Bandit..."
-                    pip install bandit
+                    pip3 install bandit
 
                     echo "Ejecutando Bandit..."
                     bandit -r app/ || true
                 '''
             }
         }
+
 
         stage('Build Docker Image') {
             steps {
