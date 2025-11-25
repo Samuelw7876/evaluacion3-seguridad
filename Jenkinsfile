@@ -12,6 +12,22 @@ pipeline {
             }
         }
 
+        stage('Debug Volume') {
+            steps {
+                sh """
+                    echo 'Contenido real del workspace desde Jenkins:'
+                    ls -R ${WORKSPACE}/app
+
+                    echo '------------ Ejecutando prueba de montaje ------------'
+
+                    docker run --rm \
+                        -v ${WORKSPACE}/app:/scan \
+                        python:3.11-slim sh -c "echo 'Contenido dentro del contenedor:' && ls -R /scan || true"
+                """
+            }
+        }
+
+
         stage('Security Scan - Bandit') {
             steps {
                 script {
