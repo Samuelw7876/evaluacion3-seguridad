@@ -12,6 +12,18 @@ pipeline {
             }
         }
 
+        stage('Security Scan - Bandit') {
+            steps {
+                sh '''
+                    echo "Instalando Bandit..."
+                    pip install bandit
+
+                    echo "Ejecutando Bandit..."
+                    bandit -r app/ || true
+                '''
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 echo "Docker host: ${DOCKER_HOST}"
