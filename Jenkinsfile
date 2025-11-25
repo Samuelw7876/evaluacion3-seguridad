@@ -34,23 +34,24 @@ pipeline {
                     docker run -d --name zap-app -p 5000:5000 evaluacion3-app
                     sleep 8
 
-                    echo " Corriendo OWASP ZAP..."
-                    docker run --name zap-scan --network host ghcr.io/zaproxy/zaproxy:stable \
+                    echo " Ejecutando OWASP ZAP..."
+
+                    docker run --name zap-scan --network host \
+                        -v /zap/wrk \
+                        ghcr.io/zaproxy/zaproxy:stable \
                         zap-baseline.py -t http://localhost:5000 -r zap_report.html || true
 
-                    echo " Copiando reporte desde el contenedor..."
+                    echo " Copiando reporte fuera del contenedor..."
                     mkdir -p ${WORKSPACE}/zap_reports
                     docker cp zap-scan:/zap/wrk/zap_report.html ${WORKSPACE}/zap_reports/
 
-                    echo "🧹 Limpiando..."
+                    echo " Limpiando contenedores..."
                     docker rm zap-scan || true
                     docker stop zap-app || true
                     docker rm zap-app || true
                 '''
             }
         }
-
-
 
 
         stage('Security Scan - Bandit') {
