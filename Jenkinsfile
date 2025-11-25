@@ -20,6 +20,17 @@ pipeline {
             }
         }
 
+        stage('Security Scan - Trivy') {
+            steps {
+                sh '''
+                    echo "Ejecutando escaneo de seguridad con Trivy..."
+                    docker run --rm \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        aquasec/trivy image evaluacion3-app || true
+                '''
+            }
+        }
+
         stage('Run App') {
             steps {
                 sh 'docker run -d --name app-test -p 5000:5000 evaluacion3-app'
