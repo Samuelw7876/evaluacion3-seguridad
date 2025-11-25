@@ -26,6 +26,20 @@ pipeline {
             }
         }
 
+        stage('Security Scan - pip-audit') {
+            steps {
+                sh '''
+                    echo "Ejecutando pip-audit dentro de contenedor..."
+                    docker run --rm \
+                        -v $(pwd)/app:/scan \
+                        python:3.11-slim sh -c "
+                            pip install --quiet pip-audit && \
+                            pip-audit -r /scan/requirements.txt || true
+                        "
+                '''
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 echo "Docker host: ${DOCKER_HOST}"
