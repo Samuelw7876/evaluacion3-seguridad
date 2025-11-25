@@ -31,11 +31,12 @@ pipeline {
         stage('Security Scan - Bandit') {
             steps {
                 sh """
-                    pip3 install bandit
+                    pip install bandit
                     bandit -r app -lll
                 """
             }
         }
+
 
         stage('Security Scan - pip-audit') {
             steps {
