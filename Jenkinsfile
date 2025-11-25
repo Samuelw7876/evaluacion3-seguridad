@@ -29,22 +29,30 @@ pipeline {
 
         stage('Security Scan - OWASP ZAP') {
             steps {
-                echo "Iniciando escaneo DAST con OWASP ZAP"
+                sh '''
+                    echo " Levantando la app para ZAP..."
+                    docker run -d --name zap-app -p 5000:5000 evaluacion3-app
+                    sleep 8
 
-                sh """
-                    docker pull ghcr.io/zaproxy/zaproxy:stable || true
+                    echo " Ejecutando OWASP ZAP..."
+
+                    mkdir -p ${WORKSPACE}/zap_reports
 
                     docker run --rm \
-                        -v \$(pwd)/zap_reports:/zap/reports \
+                        --network host \
+                        -v "${WORKSPACE}/zap_reports:/zap/wrk" \
                         ghcr.io/zaproxy/zaproxy:stable \
-                        zap-baseline.py \
-                        -t http://localhost:5000 \
-                        -r zap_report.html || true
-                """
+                        zap-baseline.py -t http://localhost:5000 -r zap_report.html || true
 
-                echo "Informe generado en zap_reports/zap_report.html"
+                    echo " Reporte ZAP generado en:"
+                    echo "${WORKSPACE}/zap_reports/zap_report.html"
+
+                    docker stop zap-app || true
+                    docker rm zap-app || true
+                '''
             }
         }
+
 
         stage('Security Scan - Bandit') {
             steps {
