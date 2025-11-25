@@ -16,19 +16,18 @@ pipeline {
             steps {
                 sh '''
                     echo "Ejecutando Bandit..."
-                    echo "Workspace real: $WORKSPACE"
-                    echo "Contenido del workspace:"
-                    ls -R $WORKSPACE
+                    echo "Workspace real: $(pwd)"
 
                     docker run --rm \
-                        -v $WORKSPACE/app:/scan \
+                        -v "$(pwd)/app:/scan" \
                         python:3.11-slim sh -c "
                             pip install --quiet bandit && \
-                            bandit -r /scan
+                            bandit -r /scan -lll
                         " || true
                 '''
             }
         }
+
 
         stage('Security Scan - pip-audit') {
             steps {
